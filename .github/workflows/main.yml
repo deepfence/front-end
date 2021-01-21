@@ -20,6 +20,8 @@ jobs:
       COMMIT: ${{ github.sha }}
       REPO: front-end
       DEEPFENCE_CONSOLE_IP: 165.22.211.64
+      FAIL_CVE_COUNT: 100
+      FAIL_CVE_SCORE: 8
     steps:
     - uses: actions/checkout@v2
 
@@ -65,8 +67,8 @@ jobs:
         FULL_IMAGE_NAME: ${{ env.GROUP }}/${{ env.REPO }}:latest
         # set the threshold for CI to pass
         # -1 means no threshold
-        FAIL_CVE_COUNT: -1
-        FAIL_CVE_SCORE: -1
+        FAIL_CVE_COUNT: ${{ env.FAIL_CVE_COUNT }}
+        FAIL_CVE_SCORE: ${{ env.FAIL_CVE_SCORE }}
       run: |
         mkdir deepfence_docker
         docker_config_path="$(pwd)/deepfence_docker"
@@ -91,8 +93,8 @@ jobs:
       uses: docker/build-push-action@v1
       if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/master'
       with:
-        username: ${{ secrets.DOCKER_USER }}
-        password: ${{ secrets.DOCKER_PASS }}
+        username: ${{ secrets.DOCKER_PUSH_USER }}
+        password: ${{ secrets.DOCKER_PUSH_PASS }}
         repository: ${{ env.GROUP }}/${{ env.REPO }}
         tag_with_ref: true
         tag_with_sha: true
